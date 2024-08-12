@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/cart_provider.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
 
-
+    // Tính tổng số tiền
     double totalAmount = cartProvider.items.entries.fold(0, (sum, entry) {
       final product = entry.key;
       final quantity = entry.value;
-
 
       final price = double.tryParse(product.price) ?? 0.0;
 
@@ -35,12 +39,58 @@ class CartScreen extends StatelessWidget {
 
                 return ListTile(
                   leading: product.image != null
-                      ? Image.network(product.image!, width: 50, height: 50, fit: BoxFit.cover)
-                      : Container(width: 50, height: 50, color: Colors.grey),
+                      ? Image.network(
+                    product.image!,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  )
+                      : Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.grey,
+                  ),
                   title: Text(product.title),
-                  subtitle: Text('Price: ${product.price} \$\nQuantity: $quantity'),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${product.price} \$',
+                        style: TextStyle(fontWeight: FontWeight.bold,color: Colors.deepOrangeAccent),),
+                      Row(
+
+                        children: [
+
+                          SizedBox(width: 10),
+                          IconButton(
+                            onPressed: () {
+                              if (quantity > 1) {
+                                setState(() {
+                                  cartProvider.updateQuantity(
+                                      product, quantity - 1);
+                                });
+                              }
+                            },
+                            icon: Icon(Icons.remove),
+                          ),
+                          Text('$quantity'),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                cartProvider.updateQuantity(
+                                    product, quantity + 1);
+                              });
+                            },
+                            icon: Icon(Icons.add),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   trailing: IconButton(
-                    icon: Icon(Icons.remove_circle,color: Colors.red,),
+                    icon: Icon(
+                      Icons.remove_circle,
+                      color: Colors.red,
+                    ),
                     onPressed: () {
                       cartProvider.removeFromCart(product);
                     },
@@ -57,11 +107,13 @@ class CartScreen extends StatelessWidget {
               children: [
                 Text(
                   'Tổng tiền:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '${totalAmount.toStringAsFixed(2)} \$',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -78,18 +130,13 @@ class CartScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                  )  ,
+                  ),
                   elevation: 5,
                 ),
                 onPressed: () {
-                  cartProvider.clearCart();
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        backgroundColor: Color(0xff39D2C0),
-                        content: Text('Mua hàng thành công!')),
-                  );
-                }, child: Text('Thanh toán'),
+                  Navigator.pushNamed(context, '/pay');
+                },
+                child: Text('Thanh toán'),
               ),
             ),
           ),

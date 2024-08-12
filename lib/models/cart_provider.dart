@@ -24,4 +24,10 @@ class CartProvider with ChangeNotifier {
     _items.clear();
     notifyListeners();
   }
+  void updateQuantity(AuthProduct product, int newQuantity) {
+    if (_items.containsKey(product)) {
+      _items[product] = newQuantity;
+      notifyListeners();
+    }
+  }
 }

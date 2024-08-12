@@ -1,6 +1,7 @@
 
 import 'package:dequy/models/auth_service.dart';
 import 'package:dequy/project/login_screen.dart';
+import 'package:dequy/project/pay_screen.dart';
 import 'package:dequy/project/product_list_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget{
             routes: {
               '/login' :(context) => LoginScreen(),
               '/products': (context) => ProductListScreen(),
+              '/pay': (context) => PayScreen(),
             },
           );
         },
