@@ -11,8 +11,6 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
-
-    // Tính tổng số tiền
     double totalAmount = cartProvider.items.entries.fold(0, (sum, entry) {
       final product = entry.key;
       final quantity = entry.value;
@@ -62,14 +60,13 @@ class _CartScreenState extends State<CartScreen> {
 
                           SizedBox(width: 10),
                           IconButton(
-                            onPressed: () {
-                              if (quantity > 1) {
-                                setState(() {
-                                  cartProvider.updateQuantity(
-                                      product, quantity - 1);
-                                });
-                              }
-                            },
+                            onPressed: quantity > 1
+                                ? () {
+                              setState(() {
+                                cartProvider.updateQuantity(product, quantity - 1);
+                              });
+                            }
+                                : null,
                             icon: Icon(Icons.remove),
                           ),
                           Text('$quantity'),

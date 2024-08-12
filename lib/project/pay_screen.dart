@@ -1,8 +1,13 @@
+import 'dart:math';
+
 import 'package:dequy/models/cart_provider.dart';
+import 'package:dequy/models/order_provider.dart';
 import 'package:dequy/widgets/CartItemWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../models/auth_service.dart';
 
 class PayScreen extends StatefulWidget {
   @override
@@ -14,24 +19,74 @@ class _PayScreenState extends State<PayScreen> {
   String _name = '';
   String _address = '';
   String _phone = '';
+  bool _isLoading = false;
 
-  void _submitOrder() {
+  void _submitOrder() async{
     if (!_formKey.currentState!.validate()) {
       return;
     }
     _formKey.currentState!.save();
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    cartProvider.clearCart();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: Color(0xff39D2C0),
-      content: Text('Mua hàng thành công'),
-    ));
-    Navigator.of(context).pop();
-  }
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    double totalAmount = cartProvider.items.entries.fold(0, (sum, entry) {
+      final product = entry.key;
+      final quantity = entry.value;
 
+      final price = double.tryParse(product.price) ?? 0.0;
+
+      return sum + (price * quantity);
+    });
+      final products = cartProvider.items.entries.map((entry){
+        return {
+          "productId": entry.key.id,
+          "quantity": entry.value,
+        };
+        }).toList();
+      DateTime now = DateTime.now();
+      String formattedDate = '${now.year}-${now.month}-${now.day}';
+      var random = Random();
+      int randomNumber = random.nextInt(1<<32);
+      final orderData = {
+      "userId": randomNumber,
+        "date": formattedDate,
+        "products": products
+      };
+      print(formattedDate);
+      String token = Provider.of<AuthService>(context, listen: false).token as String;
+    setState(() {
+      _isLoading = true;
+    });
+      try{
+        await orderProvider.submitOrder(orderData,token);
+        cartProvider.clearCart();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Color(0xff39D2C0),
+          content: Text('Mua hàng thành công'),
+        ));
+        Navigator.pushReplacementNamed(context, '/products');
+      }
+      catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Có lỗi xảy ra. Vui lòng thử lại.'),
+        ));
+      }finally{
+        setState(() {
+          _isLoading = false;
+        });
+      }
+  }
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
+    double totalAmount = cartProvider.items.entries.fold(0, (sum, entry) {
+      final product = entry.key;
+      final quantity = entry.value;
+
+      final price = double.tryParse(product.price) ?? 0.0;
+
+      return sum + (price * quantity);
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text('Thanh toán'),
@@ -125,17 +180,32 @@ class _PayScreenState extends State<PayScreen> {
                   Spacer(),
                   Chip(
                     label: Text(
-                      // '\$${.toStringAsFixed(2)}',
-                      'avc',
+                      '\$${totalAmount.toStringAsFixed(2)}',
+
                       style: TextStyle(
                         color: Theme.of(context).primaryTextTheme.titleLarge?.color,
                       ),
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  ElevatedButton(
-                    onPressed: _submitOrder,
-                    child: Text('PAY NOW'),
+                  SizedBox(width: 8,),
+                  Container(
+                    // width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 6,horizontal: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        )  ,
+                        elevation: 5,
+                      ),
+                      onPressed: _submitOrder,
+                      child: _isLoading
+                          ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2,)
+                          : Text('PAY NOW'),
+                    ),
                   ),
                 ],
               ),

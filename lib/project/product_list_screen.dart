@@ -178,13 +178,13 @@ class ProductListScreen extends StatelessWidget {
                                           Row(
                                             children: [
                                               IconButton(
-                                                onPressed: () {
-                                                  if (quantity > 1) {
-                                                    setState(() {
-                                                      quantity--;
-                                                    });
-                                                  }
-                                                },
+                                                onPressed: quantity > 1
+                                                    ? () {
+                                                  setState(() {
+                                                    cartProvider.updateQuantity(product, quantity --);
+                                                  });
+                                                }
+                                                    : null,
                                                 icon: Icon(Icons.remove),
                                                 color: Colors.red,
                                               ),
