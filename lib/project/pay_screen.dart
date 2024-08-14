@@ -28,14 +28,6 @@ class _PayScreenState extends State<PayScreen> {
     _formKey.currentState!.save();
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-    double totalAmount = cartProvider.items.entries.fold(0, (sum, entry) {
-      final product = entry.key;
-      final quantity = entry.value;
-
-      final price = double.tryParse(product.price) ?? 0.0;
-
-      return sum + (price * quantity);
-    });
       final products = cartProvider.items.entries.map((entry){
         return {
           "productId": entry.key.id,
@@ -63,7 +55,7 @@ class _PayScreenState extends State<PayScreen> {
           backgroundColor: Color(0xff39D2C0),
           content: Text('Mua hàng thành công'),
         ));
-        Navigator.pushReplacementNamed(context, '/products');
+        Navigator.pushReplacementNamed(context, '/navBar');
       }
       catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

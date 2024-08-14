@@ -1,3 +1,4 @@
+import 'package:dequy/models/auth_cart.dart';
 import 'package:dequy/models/auth_service.dart';
 import 'package:dequy/models/order_provider.dart';
 import 'package:dequy/project/login_screen.dart';
@@ -9,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../models/auth_product.dart';
 import '../models/cart_provider.dart';
+import 'navigationBar.dart';
 
 void main() async {
   WidgetsFlutterBinding
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ProductProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => OrderProvider()),
+        ChangeNotifierProvider(create: (context) => AuthCart()),
       ],
       child: Consumer<AuthService>(
         builder: (context, auth, _) {
@@ -41,8 +44,9 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Sale Application',
             theme: ThemeData(primarySwatch: Colors.blue),
-            home: auth.token == null ? LoginScreen() : ProductListScreen(),
+            home: auth.token == null ? LoginScreen() :MainScreen(),
             routes: {
+              '/navBar':(context) => MainScreen(),
               '/login': (context) => LoginScreen(),
               '/products': (context) => ProductListScreen(),
               '/pay': (context) => PayScreen(),
