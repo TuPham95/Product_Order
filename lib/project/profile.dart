@@ -99,15 +99,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             '${user.address.street}, ${user.address.number}, ${user.address.city}, ${user.address.zipcode}',
                             style: TextStyle(fontSize: 18),
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Geolocation',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'Lat: ${user.address.geolocation.lat}, Long: ${user.address.geolocation.long}',
-                            style: TextStyle(fontSize: 18),
-                          ),
+                          // SizedBox(height: 8),
+                          // Text(
+                          //   'Geolocation',
+                          //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          // ),
+                          // Text(
+                          //   'Lat: ${user.address.geolocation.lat}, Long: ${user.address.geolocation.long}',
+                          //   style: TextStyle(fontSize: 18),
+                          // ),
                         ],
                       ),
                     ),
