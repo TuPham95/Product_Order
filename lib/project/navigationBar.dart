@@ -17,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     ProductListScreen(),
     CartListScreen(),
-    Profile(),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

@@ -176,7 +176,7 @@ class _loginScreenState extends State<LoginScreen> {
                                   });
                                   if (success) {
                                     Navigator.of(context)
-                                        .pushReplacementNamed('/products');
+                                        .pushReplacementNamed('/navBar');
                                   } else {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(

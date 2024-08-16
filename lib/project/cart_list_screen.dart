@@ -1,6 +1,9 @@
+// lib/screens/cart_list_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/auth_cart.dart';
+import '../widgets/cancel_order_dialog.dart';
 
 class CartListScreen extends StatefulWidget {
   @override
@@ -11,7 +14,21 @@ class _CartListScreenState extends State<CartListScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => Provider.of<AuthCart>(context, listen: false).fectchCarts());
+    Future.microtask(() => Provider.of<AuthCart>(context, listen: false).fetchCarts());
+  }
+
+  void _showCancelOrderDialog(BuildContext context, String cartId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CancelOrderDialog(
+          cartId: cartId,
+          onConfirm: (id) async {
+            await Provider.of<AuthCart>(context, listen: false).deleteOrder(id);
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -57,13 +74,25 @@ class _CartListScreenState extends State<CartListScreen> {
                     'Sản phẩm: ${cart.products.length}',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
-                  children: cart.products.map((product) {
-                    return ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      title: Text('Sản phẩm ID: ${product.productId}'),
-                      subtitle: Text('Số lượng: ${product.quantity}'),
-                    );
-                  }).toList(),
+                  children: [
+                    ...cart.products.map((product) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        title: Text('Sản phẩm ID: ${product.productId}'),
+                        subtitle: Text('Số lượng: ${product.quantity}'),
+                      );
+                    }).toList(),
+                    ButtonBar(
+                      children: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            _showCancelOrderDialog(context, cart.id);
+                          },
+                          child: Text('Hủy đơn hàng'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               );
             },

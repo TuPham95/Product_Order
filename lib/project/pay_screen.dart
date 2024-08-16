@@ -6,6 +6,7 @@ import 'package:dequy/widgets/CartItemWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/auth_service.dart';
 
@@ -36,10 +37,12 @@ class _PayScreenState extends State<PayScreen> {
         }).toList();
       DateTime now = DateTime.now();
       String formattedDate = '${now.year}-${now.month}-${now.day}';
-      var random = Random();
-      int randomNumber = random.nextInt(1<<32);
+      // var random = Random();
+      // int randomNumber = random.nextInt(1<<32);
+    final prefs = await SharedPreferences.getInstance();
+    String? _userId = prefs.getString('userId');
       final orderData = {
-      "userId": randomNumber,
+      "userId": _userId,
         "date": formattedDate,
         "products": products
       };

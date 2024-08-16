@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/auth_product.dart';
+import '../models/auth_profile.dart';
 import '../models/cart_provider.dart';
 import 'navigationBar.dart';
 
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => OrderProvider()),
         ChangeNotifierProvider(create: (context) => AuthCart()),
+        ChangeNotifierProvider(create: (context) => UserProfileProvider()),
       ],
       child: Consumer<AuthService>(
         builder: (context, auth, _) {
@@ -44,9 +46,9 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Sale Application',
             theme: ThemeData(primarySwatch: Colors.blue),
-            home: auth.token == null ? LoginScreen() :MainScreen(),
+            home: auth.token == null ? LoginScreen() : MainScreen(),
             routes: {
-              '/navBar':(context) => MainScreen(),
+              '/navBar': (context) => MainScreen(),
               '/login': (context) => LoginScreen(),
               '/products': (context) => ProductListScreen(),
               '/pay': (context) => PayScreen(),
