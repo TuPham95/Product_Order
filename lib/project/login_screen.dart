@@ -83,15 +83,6 @@ class _loginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Padding(
-                    //   padding: EdgeInsets.symmetric(vertical: 16.0),
-                    //   child:
-                      // Icon(
-                      //   Icons.shopping_cart,
-                      //   size: 80,
-                      //   color: Colors.teal,
-                      // ),
-                    // ),
                     Container(
                       margin: EdgeInsets.only(bottom: 16),
                       child: TextFormField(

@@ -2,9 +2,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'auth_service.dart'; // Nếu cần thiết
-
 class AuthCart with ChangeNotifier {
   List<Cart> _cart = [];
   bool _isLoading = false;
@@ -30,7 +27,6 @@ class AuthCart with ChangeNotifier {
     }
 
     final String apiUrl = 'https://fakestoreapi.com/carts/user/$userId';
-    // print('Fetching carts from: $apiUrl');
 
     try {
       final response = await http.get(Uri.parse(apiUrl));

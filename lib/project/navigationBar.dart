@@ -2,9 +2,7 @@ import 'package:dequy/project/product_list_screen.dart';
 import 'package:dequy/project/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'cart_list_screen.dart';
-import 'login_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -46,14 +44,14 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.teal,
         unselectedItemColor: Colors.grey[600],
         backgroundColor: Colors.white,
         showSelectedLabels: true,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
-        elevation: 8.0, // Độ cao bóng đổ
+        elevation: 8.0,
       ),
     );
   }
