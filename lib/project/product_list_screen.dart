@@ -62,13 +62,13 @@ class ProductListScreen extends StatelessWidget {
             ],
           ),
 
-          IconButton(
-            onPressed: () async {
-              Provider.of<AuthService>(context, listen: false).logout();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-            icon: Icon(Icons.logout),
-          ),
+          // IconButton(
+          //   onPressed: () async {
+          //     Provider.of<AuthService>(context, listen: false).logout();
+          //     Navigator.pushReplacementNamed(context, '/login');
+          //   },
+          //   icon: Icon(Icons.logout),
+          // ),
         ],
       ),
       body: productProvider.products.isEmpty

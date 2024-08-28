@@ -8,10 +8,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/auth_product.dart';
-import '../models/auth_profile.dart';
-import '../models/cart_provider.dart';
-import 'navigationBar.dart';
+import 'models/auth_product.dart';
+import 'models/auth_profile.dart';
+import 'models/cart_provider.dart';
+import 'project/navigationBar.dart';
 
 void main() async {
   WidgetsFlutterBinding
