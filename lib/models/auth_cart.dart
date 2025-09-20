@@ -19,14 +19,14 @@ class AuthCart with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
 
-    if (userId == null) {
-      _errorMessage = 'User ID is not found';
-      _isLoading = false;
-      notifyListeners();
-      return;
-    }
+    // if (userId == null) {
+    //   _errorMessage = 'User ID is not found';
+    //   _isLoading = false;
+    //   notifyListeners();
+    //   return;
+    // }
 
-    final String apiUrl = 'https://fakestoreapi.com/carts/user/$userId';
+    final String apiUrl = 'https://fakestoreapi.com/carts/user/1';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
