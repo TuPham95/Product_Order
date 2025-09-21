@@ -15,10 +15,10 @@ class AuthService with ChangeNotifier{
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'username': username, 'password': password})
     );
-    if(response.statusCode == 200){
+    if(response.statusCode == 201){
       final data = json.decode(response.body);
       _token = data['token'];
-      _userId = '2';
+      _userId = '1';
       print(_token);
 
       final prefs = await SharedPreferences.getInstance();
