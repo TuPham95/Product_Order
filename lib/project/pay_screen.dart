@@ -1,16 +1,15 @@
-import 'dart:math';
-
 import 'package:dequy/models/cart_provider.dart';
 import 'package:dequy/models/order_provider.dart';
-import 'package:dequy/widgets/CartItemWidget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/auth_service.dart';
+import '../widgets/cart_item_widget.dart';
 
 class PayScreen extends StatefulWidget {
+  const PayScreen({Key? key}) : super(key: key);
+
   @override
   State<PayScreen> createState() => _PayScreenState();
 }
@@ -22,191 +21,233 @@ class _PayScreenState extends State<PayScreen> {
   String _phone = '';
   bool _isLoading = false;
 
-  void _submitOrder() async{
+  Future<void> _submitOrder() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
     _formKey.currentState!.save();
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-      final products = cartProvider.items.entries.map((entry){
-        return {
-          "productId": entry.key.id,
-          "quantity": entry.value,
-        };
-        }).toList();
-      DateTime now = DateTime.now();
-      String formattedDate = '${now.year}-${now.month}-${now.day}';
-      // var random = Random();
-      // int randomNumber = random.nextInt(1<<32);
-    final prefs = await SharedPreferences.getInstance();
-    String? _userId = prefs.getString('userId');
-      final orderData = {
-      "userId": _userId,
-        "date": formattedDate,
-        "products": products
+    final products = cartProvider.items.entries.map((entry) {
+      return {
+        'productId': entry.key.id,
+        'quantity': entry.value,
       };
-      print(formattedDate);
-      String token = Provider.of<AuthService>(context, listen: false).token as String;
+    }).toList();
+
+    final now = DateTime.now();
+    final formattedDate = '${now.year}-${now.month}-${now.day}';
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    final orderData = {
+      'userId': userId,
+      'date': formattedDate,
+      'products': products,
+      'customer': {
+        'name': _name,
+        'address': _address,
+        'phone': _phone,
+      },
+    };
+
+    final token =
+        Provider.of<AuthService>(context, listen: false).token as String;
+
     setState(() {
       _isLoading = true;
     });
-      try{
-        await orderProvider.submitOrder(orderData,token);
-        cartProvider.clearCart();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Color(0xff39D2C0),
-          content: Text('Mua hàng thành công'),
-        ));
-        Navigator.pushReplacementNamed(context, '/navBar');
-      }
-      catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+
+    try {
+      await orderProvider.submitOrder(orderData, token);
+      cartProvider.clearCart();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Color(0xFF0D9488),
+          content: Text('Đặt hàng thành công'),
+        ),
+      );
+      Navigator.pushReplacementNamed(context, '/navBar');
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
           backgroundColor: Colors.red,
           content: Text('Có lỗi xảy ra. Vui lòng thử lại.'),
-        ));
-      }finally{
-        setState(() {
-          _isLoading = false;
-        });
-      }
+        ),
+      );
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
-    double totalAmount = cartProvider.items.entries.fold(0, (sum, entry) {
-      final product = entry.key;
-      final quantity = entry.value;
-
-      final price = double.tryParse(product.price) ?? 0.0;
-
-      return sum + (price * quantity);
+    final totalAmount =
+        cartProvider.items.entries.fold<double>(0, (sum, entry) {
+      final price = double.tryParse(entry.key.price) ?? 0.0;
+      return sum + (price * entry.value);
     });
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thanh toán'),
+        title: const Text('Thanh toán'),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Name',
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Thông tin nhận hàng',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your name';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _name = value!;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Address',
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Họ và tên',
+                              prefixIcon: Icon(Icons.person_outline),
+                            ),
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Vui lòng nhập tên'
+                                : null,
+                            onSaved: (value) {
+                              _name = value!;
+                            },
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your address';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _address = value!;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Phone',
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Địa chỉ',
+                              prefixIcon: Icon(Icons.location_on_outlined),
+                            ),
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Vui lòng nhập địa chỉ'
+                                : null,
+                            onSaved: (value) {
+                              _address = value!;
+                            },
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your phone';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _phone = value!;
-                          },
-                        ),
-                      ],
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            keyboardType: TextInputType.phone,
+                            decoration: const InputDecoration(
+                              labelText: 'Số điện thoại',
+                              prefixIcon: Icon(Icons.phone_outlined),
+                            ),
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Vui lòng nhập số điện thoại'
+                                : null,
+                            onSaved: (value) {
+                              _phone = value!;
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(height: 10,),
-                  Divider(),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: cartProvider.items.keys.length,
-                    itemBuilder: (context, index) {
-                      final cartItem = cartProvider.items.keys.elementAt(index);
-                      final quantity = cartProvider.items[cartItem]!;
-                      return Cartitemwidget(
-                        image: cartItem.image!,
-                        title: cartItem.title,
-                        price: cartItem.price,
-                        quantity: quantity,
-                      );
-                    },
+                ),
+                const SizedBox(height: 12),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    'Sản phẩm thanh toán',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                   ),
-                  Divider(),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+                ...cartProvider.items.entries.map((entry) {
+                  final item = entry.key;
+                  final quantity = entry.value;
+                  return CartItemWidget(
+                    image: item.image ?? '',
+                    title: item.title,
+                    price: item.price,
+                    quantity: quantity,
+                  );
+                }),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x1A000000),
+                  blurRadius: 14,
+                  offset: Offset(0, -4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Total',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Tổng thanh toán',
+                        style: TextStyle(color: Color(0xFF475569)),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '\$${totalAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
-                  Spacer(),
-                  Chip(
-                    label: Text(
-                      '\$${totalAmount.toStringAsFixed(2)}',
-
-                      style: TextStyle(
-                        color: Theme.of(context).primaryTextTheme.titleLarge?.color,
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0D9488),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 20,
                       ),
                     ),
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                  SizedBox(width: 8,),
-                  Container(
-                    // width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 6,horizontal: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        )  ,
-                        elevation: 5,
-                      ),
-                      onPressed: _submitOrder,
-                      child: _isLoading
-                          ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2,)
-                          : Text('PAY NOW'),
-                    ),
+                    onPressed: _isLoading ? null : _submitOrder,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('Đặt hàng'),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

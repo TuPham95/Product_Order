@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 class AuthCart with ChangeNotifier {
   List<Cart> _cart = [];
   bool _isLoading = false;
@@ -35,7 +36,8 @@ class AuthCart with ChangeNotifier {
         List<dynamic> data = json.decode(response.body);
         _cart = data.map((json) => Cart.fromJson(json)).toList();
       } else {
-        _errorMessage = 'Failed to load cart. Status code: ${response.statusCode}';
+        _errorMessage =
+            'Failed to load cart. Status code: ${response.statusCode}';
       }
     } catch (error) {
       _errorMessage = 'An error occurred: $error';
@@ -61,7 +63,8 @@ class AuthCart with ChangeNotifier {
         _cart.removeWhere((cart) => cart.id == cartId);
         _errorMessage = 'Order successfully deleted';
       } else {
-        _errorMessage = 'Failed to delete order. Status code: ${response.statusCode}';
+        _errorMessage =
+            'Failed to delete order. Status code: ${response.statusCode}';
       }
     } catch (error) {
       _errorMessage = 'An error occurred: $error';
@@ -87,7 +90,8 @@ class Cart {
 
   factory Cart.fromJson(Map<String, dynamic> json) {
     var productsFromJson = json['products'] as List;
-    List<Product> products = productsFromJson.map((i) => Product.fromJson(i)).toList();
+    List<Product> products =
+        productsFromJson.map((i) => Product.fromJson(i)).toList();
     return Cart(
       id: json['id'].toString(),
       userId: json['userId'].toString(),

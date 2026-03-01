@@ -11,7 +11,7 @@ class OrderProvider with ChangeNotifier {
         Uri.parse(url),
         headers: {
           "Content-Type": "application/json",
-          "Authorizatoin": "Bearer $token",
+          "Authorization": "Bearer $token",
         },
         body: json.encode(orderData),
       );

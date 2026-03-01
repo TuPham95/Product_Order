@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class UserProfile {
   final int id;
   final String email;
@@ -97,8 +96,6 @@ class Geolocation {
   }
 }
 
-
-
 class UserProfileProvider with ChangeNotifier {
   UserProfile? _userProfile;
 
@@ -107,7 +104,8 @@ class UserProfileProvider with ChangeNotifier {
   Future<void> fetchUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
-    final response = await http.get(Uri.parse('https://fakestoreapi.com/users/1'));
+    final response =
+        await http.get(Uri.parse('https://fakestoreapi.com/users/1'));
 
     if (response.statusCode == 200) {
       _userProfile = UserProfile.fromJson(json.decode(response.body));

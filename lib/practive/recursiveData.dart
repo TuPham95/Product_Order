@@ -52,14 +52,14 @@ class RecursiveDataLayout extends StatelessWidget {
 			]
 }
 ''';
-  void printNote(Map<String, dynamic> node){
+  void printNote(Map<String, dynamic> node) {
     // ky thuat de quy
     print(node['id']);
-    for(var child in node['data']){
+    for (var child in node['data']) {
       printNote(child); // goi de quy
     }
-
   }
+
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> data = jsonDecode(jsonData);

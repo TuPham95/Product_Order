@@ -4,7 +4,8 @@ import '../models/auth_product.dart';
 class CartProvider with ChangeNotifier {
   Map<AuthProduct, int> _items = {};
   Map<AuthProduct, int> get items => _items;
-  int get totalQuantity => _items.values.fold(0, (sum, quantity) => sum + quantity);
+  int get totalQuantity =>
+      _items.values.fold(0, (sum, quantity) => sum + quantity);
 
   void addToCart(AuthProduct product, int quantity) {
     if (_items.containsKey(product)) {
@@ -24,6 +25,7 @@ class CartProvider with ChangeNotifier {
     _items.clear();
     notifyListeners();
   }
+
   void updateQuantity(AuthProduct product, int newQuantity) {
     if (_items.containsKey(product)) {
       _items[product] = newQuantity;
