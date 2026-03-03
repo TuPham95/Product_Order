@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/auth_profile.dart';
 import '../models/auth_service.dart';
+import 'cart_list_screen.dart';
 import '../widgets/skeleton_loader.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -85,11 +86,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _SectionCard(
                 title: 'Thao tác nhanh',
                 child: Row(
-                  children: const [
+                  children: [
                     Expanded(
                       child: _ActionChip(
                         icon: Icons.shopping_bag_outlined,
                         label: 'Đơn hàng',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CartListScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     SizedBox(width: 10),
@@ -348,26 +357,31 @@ class _SectionCard extends StatelessWidget {
 class _ActionChip extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
-  const _ActionChip({required this.icon, required this.label});
+  const _ActionChip({required this.icon, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5FAFA),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: const Color(0xFF0D9488), size: 20),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-          ),
-        ],
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5FAFA),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: const Color(0xFF0D9488), size: 20),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }
